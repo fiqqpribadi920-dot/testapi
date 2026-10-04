@@ -3,7 +3,7 @@ from openai import OpenAI
 import os
 
 # 1. Mengambil API Key secara aman dari Cloud Secrets
-api_key = os.environ.get("oc_sk_8caf9a9967dc_UbIwXPGLZ-ETwkhGR9NPeziO-AvY1Tfq")
+api_key = os.environ.get("OPENAI_API_KEY")
 
 if not api_key:
     st.error("API Key belum dikonfigurasi di server Secrets!")
