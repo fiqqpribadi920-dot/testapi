@@ -1,17 +1,17 @@
 import streamlit as st
-from openai import OpenAI
+import anthropic
 import os
 
 # 1. Mengambil API Key secara aman dari Cloud Secrets
-api_key = os.environ.get("OPENAI_API_KEY")
+api_key = os.environ.get("ANTHROPIC_API_KEY")
 
 if not api_key:
     st.error("API Key belum dikonfigurasi di server Secrets!")
 else:
-    # Inisialisasi client OpenAI
-    client = OpenAI(api_key=api_key)
+    # Inisialisasi client Anthropic
+    client = anthropic.Anthropic(api_key=api_key)
 
-    st.title("🤖 OpenAI GPT Milikku")
+    st.title("🤖 Claude AI Milikku")
     st.write("Selamat datang! Silakan mengobrol dengan AI buatan saya.")
 
     # 2. Membuat sistem memori chat (Chat History)
@@ -24,26 +24,27 @@ else:
             st.markdown(message["content"])
 
     # 3. Menerima input chat dari user
-    if prompt := st.chat_input("Tanya sesuatu ke GPT..."):
+    if prompt := st.chat_input("Tanya sesuatu ke Claude..."):
         # Tampilkan chat user di layar
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Ambil respon dari OpenAI API
+        # Ambil respon dari Claude API
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            with st.spinner("GPT sedang berpikir..."):
+            with st.spinner("Claude sedang berpikir..."):
                 try:
-                    # Memanggil model gpt-4o-mini (bisa diganti ke "gpt-4o" jika mau yang lebih cerdas)
-                    response = client.chat.completions.create(
-                        model="gpt-4o-mini",
+                    # Memanggil Claude 3.5 Sonnet
+                    response = client.messages.create(
+                        model="claude-3-5-sonnet-20241022",
+                        max_tokens=1024,
                         messages=[
                             {"role": m["role"], "content": m["content"]}
                             for m in st.session_state.messages
                         ]
                     )
-                    ai_response = response.choices[0].message.content
+                    ai_response = response.content[0].text
                     message_placeholder.markdown(ai_response)
                     
                     # Simpan respon AI ke dalam history
